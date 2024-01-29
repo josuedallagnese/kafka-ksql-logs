@@ -1,0 +1,85 @@
+version: '3'
+services:
+
+  kafka0:
+    image: confluentinc/cp-kafka:7.5.3
+    hostname: kafka0
+    container_name: kafka0
+    ports:
+      - "9092:9092"
+      - "11001:11001"
+    environment:
+      CLUSTER_ID: 'm1Ze6AjGRwqarkcxJscgyQ'
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka0:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka0:29092,CONTROLLER://kafka0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      KAFKA_OPTS: -javaagent:/usr/share/jmx_exporter/jmx_prometheus_javaagent.jar=11001:/usr/share/jmx_exporter/kafka-broker.yml
+    volumes:
+      - ./jmx-exporter:/usr/share/jmx_exporter/
+    command: "bash /usr/share/jmx_exporter/kafka-prepare-and-run"
+
+  kafka-init-topics:
+    image: confluentinc/cp-kafka:7.5.3
+    depends_on:
+      - kafka0
+    command: "bash -c 'echo Waiting for Kafka to be ready... && \
+               cub kafka-ready -b kafka0:29092 1 30 && \
+               kafka-topics --create --topic request-logging.account --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092'"
+
+  ksqldb0:
+    image: confluentinc/ksqldb-server:0.29.0
+    depends_on:
+      - kafka0
+    ports:
+      - 8088:8088
+    environment:
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_BOOTSTRAP_SERVERS: kafka0:29092
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+      TZ: "America/Sao_Paulo"
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - kafka0
+      - ksqldb0
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092
+      KAFKA_CLUSTERS_0_METRICS_PORT: 11001
+      KAFKA_CLUSTERS_0_METRICS_TYPE: PROMETHEUS
+      KAFKA_CLUSTERS_0_KSQLDBSERVER: http://ksqldb0:8088
+
+  account-web:
+    image: account-web
+    hostname: account-web
+    ports:
+      - 5002:5002
+    depends_on:
+      - kafka0
+    environment:
+      - RequestLogging__ApplicationName=request-logging.account
+      - RequestLogging__Mode=Batch
+      - RequestLogging__Kafka__BootstrapServers=kafka0:29092
+      - RequestLogging__Kafka__LingerMs=10000
+      - ASPNETCORE_URLS=http://+:5002
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '0.5GB'

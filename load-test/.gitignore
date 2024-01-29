@@ -1,0 +1,6 @@
+/deps
+/user-files/results
+/user-files/resources
+
+.metals
+.vscode

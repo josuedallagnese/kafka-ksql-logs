@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Logging.Http", "src\Infrastructure.Logging.Http\Infrastructure.Logging.Http.csproj", "{77E7B7EC-7DD1-441B-B292-CC7B721E9362}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{8FF564D8-1898-4104-A7B7-6DBE7A3B4F30}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Account.Web", "src\samples\Account.Web\Account.Web.csproj", "{7A9FCC08-2775-46CF-B222-D37ABF90680C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77E7B7EC-7DD1-441B-B292-CC7B721E9362}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77E7B7EC-7DD1-441B-B292-CC7B721E9362}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77E7B7EC-7DD1-441B-B292-CC7B721E9362}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77E7B7EC-7DD1-441B-B292-CC7B721E9362}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A9FCC08-2775-46CF-B222-D37ABF90680C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A9FCC08-2775-46CF-B222-D37ABF90680C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A9FCC08-2775-46CF-B222-D37ABF90680C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A9FCC08-2775-46CF-B222-D37ABF90680C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7A9FCC08-2775-46CF-B222-D37ABF90680C} = {8FF564D8-1898-4104-A7B7-6DBE7A3B4F30}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7FA737B9-4DED-41C1-98B6-6B316A18EE46}
+	EndGlobalSection
+EndGlobal

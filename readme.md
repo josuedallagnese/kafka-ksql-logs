@@ -1,32 +1,79 @@
-# Exemplo
+# Kafka + ksqlDB + Logging
 
-1) Suba o kafka + ksqldb na pasta tools:
-```
-docker compose up -d
-```
+Em determinadas situações sejam por limitações de infra ou de outra natureza, não temos como utilizar uma coleta de log para requests de entrada em nossa API baseada em um modelo sidecar, como fariamos com o istio por exemplo. \
+Para um ambiente já existente de Kafka por exemplo, a ideia foi utilizar o proprio broker como ferramenta para armezenar esses logs e consultá-los através do ksqlDB. \
+A rentenção desse log será controlada pelo tempo de retenção do próprio tópico criado.
+Essa library coleta os dados usando um Attributo de RequestLogAttribute que realiza a leitura no seguinte modelo:
 
-2) Verifique o status do ksql:
-- http://localhost:8088/info
-- http://localhost:8088/healthcheck
+```json
 
-3) Abra um cmd ou um sh dentro da pasta "Kafka.Sample.Producer" e execute para criar e alimentar os tópicos "products", "customers" e "orders":
-```
-dotnet run
 ```
 
-4) Acesse o ksql-cli executando o ksql-cli:
+KafkaUI: http://localhost:8080
+API de exemplo: http://localhost:5002/swagger/index.html
+
+# Executando o exemplo:
+1) Dentro da pasta docker execute:
+```shell
+sh build.sh
+sh run.sh
 ```
-docker compose exec ksqldb-cli ksql http://ksqldb-server:8088
 
-// Para ver o conteúdo do tópicos, tables e streams:
-ksql> show streams;
-ksql> CREATE STREAM orders (Date VARCHAR KEY, ProductCode VARCHAR, CustomerId VARCHAR, Quantity INTEGER) WITH (KAFKA_TOPIC='orders', VALUE_FORMAT='JSON');
-ksql> CREATE STREAM products (Code VARCHAR KEY, Name VARCHAR) WITH (KAFKA_TOPIC='products', VALUE_FORMAT='JSON');
+2) Dentro da pasta load-test rode o teste de carga para gerar dados para seu teste:
+```sh
+sudo apt-get install unzip
+sudo apt-get update
+sudo apt install default-jdk
+java -version
+```
 
-ksql> CREATE TABLE TOP_ORDERS AS
-        SELECT p.name, SUM(o.quantity) AS total
-        FROM orders o JOIN products p WITHIN 7 DAYS GRACE PERIOD 30 MINUTES ON p.code = o.productCode
-        GROUP BY p.name;
-ksql> SET 'auto.offset.reset' = 'earliest';
-ksql> print TOP_ORDERS;
+```sh
+python resources_generator.py
+```
+
+```sh
+sh install-gatling.sh
+sh run-test.sh
+```
+
+3) Abra o Kafka UI pelo endereço http://localhost:8080/ e na seção ksqlDB execute as queries abaixo alterando conforme o seu contexto:
+
+```sql
+-- Para cria o stream
+CREATE STREAM account_logs (queryString VARCHAR, headers VARCHAR, path VARCHAR, request VARCHAR, response VARCHAR, statusCode INTEGER, timestamp VARCHAR)
+  WITH (kafka_topic='request-logging.account', value_format='JSON');
+
+SET 'auto.offset.reset' = 'earliest';
+SET 'auto.offset.reset' = 'latest';
+
+select timestamp, path, JSON_RECORDS(request), JSON_RECORDS(response)
+from account_logs
+where 
+  PARSE_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss') > '2024-01-29T14:00:00'
+LIMIT 1000;
+
+select timestamp, path, JSON_RECORDS(request), JSON_RECORDS(response)
+from account_logs
+where 
+  PARSE_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss') > '2024-01-29T14:00:00'
+  AND
+  EXTRACTJSONFIELD(request, '$.mail') = 'HX5haVPa@gmail.com'
+LIMIT 1000;
+
+select timestamp, path, JSON_RECORDS(request), JSON_RECORDS(response)
+from account_logs
+where 
+  PARSE_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss') > '2024-01-29T14:00:00'
+  AND
+  statusCode = 500
+LIMIT 1000;
+
+select timestamp, path, JSON_RECORDS(request), JSON_RECORDS(response)
+from account_logs
+where 
+  PARSE_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss') > '2024-01-29T14:00:00'
+  AND
+  response like '%Sorry about that%'
+LIMIT 1000;
+
 ```
