@@ -2,7 +2,7 @@
 
 Em determinadas situações sejam por limitações de infra ou de outra natureza, não temos como utilizar uma coleta de log para requests de entrada em nossa API baseada em um modelo sidecar, como fariamos com o istio por exemplo. \
 Para um ambiente já existente de Kafka, a ideia foi utilizar o proprio broker como ferramenta para armezenar esses logs e consultá-los através do ksqlDB. \
-A rentenção desse log seria controlada pelo tempo de retenção do próprio tópico criado.
+A rentenção desse log seria controlada pelo tempo de retenção do próprio tópico criado. \
 Essa library coleta os dados usando um Attributo de RequestLogAttribute que realiza a leitura no seguinte formato:
 
 ```json
@@ -31,7 +31,7 @@ Essa library coleta os dados usando um Attributo de RequestLogAttribute que real
 }
 ```
 
-KafkaUI: http://localhost:8080
+KafkaUI: http://localhost:8080 \
 API de exemplo: http://localhost:5002/swagger/index.html
 
 # Executando o exemplo:
