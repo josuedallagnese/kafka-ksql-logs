@@ -1,25 +1,47 @@
 # Kafka + ksqlDB + Logging
 
 Em determinadas situações sejam por limitações de infra ou de outra natureza, não temos como utilizar uma coleta de log para requests de entrada em nossa API baseada em um modelo sidecar, como fariamos com o istio por exemplo. \
-Para um ambiente já existente de Kafka por exemplo, a ideia foi utilizar o proprio broker como ferramenta para armezenar esses logs e consultá-los através do ksqlDB. \
-A rentenção desse log será controlada pelo tempo de retenção do próprio tópico criado.
-Essa library coleta os dados usando um Attributo de RequestLogAttribute que realiza a leitura no seguinte modelo:
+Para um ambiente já existente de Kafka, a ideia foi utilizar o proprio broker como ferramenta para armezenar esses logs e consultá-los através do ksqlDB. \
+A rentenção desse log seria controlada pelo tempo de retenção do próprio tópico criado.
+Essa library coleta os dados usando um Attributo de RequestLogAttribute que realiza a leitura no seguinte formato:
 
 ```json
-
+{
+	"timestamp": "2024-01-29 14:45:42",
+	"path": "POST: /api/account",
+	"statusCode": 201,
+	"queryString": "",
+	"headers": [
+		"Accept:*/*",
+		"Host:localhost:5002",
+		"User-Agent:Logging Http Load Test",
+		"Content-Type:application/json",
+		"Content-Length:129",
+		"api-key:correlation-id-key"
+	],
+	"request": {
+		"name": "pMqqxjyYnHxsUJP VzFoWhSJYOjWBPN uorTWtfusXCqZB culGPiNcYAuzRRweDRcbSJnkjNtrQOuSjqj tVNc",
+		"mail": "HX5haVPa@gmail.com"
+	},
+	"response": {
+		"id": "8041b992-556e-430b-8b09-d4c63f54a663",
+		"name": "pMqqxjyYnHxsUJP VzFoWhSJYOjWBPN uorTWtfusXCqZB culGPiNcYAuzRRweDRcbSJnkjNtrQOuSjqj tVNc",
+		"mail": null
+	}
+}
 ```
 
 KafkaUI: http://localhost:8080
 API de exemplo: http://localhost:5002/swagger/index.html
 
 # Executando o exemplo:
-1) Dentro da pasta docker execute:
+1) Na pasta docker execute:
 ```shell
 sh build.sh
 sh run.sh
 ```
 
-2) Dentro da pasta load-test rode o teste de carga para gerar dados para seu teste:
+2) Na pasta load-test rode o teste de carga para gerar dados para seu teste:
 ```sh
 sudo apt-get install unzip
 sudo apt-get update
