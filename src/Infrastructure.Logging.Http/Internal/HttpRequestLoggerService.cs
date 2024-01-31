@@ -10,8 +10,10 @@ namespace Infrastructure.Logging.Http.Internal
     {
         private readonly Channel<RequestLog> _requestLogChannel;
         private readonly IProducer<string, RequestLog> _kafkaProducer;
-        private readonly IOptions<RequestLogOptions> _options;
         private readonly ILogger _logger;
+
+        private readonly string _topicName;
+        private readonly RequestLogMode _mode;
 
         public HttpRequestLoggerService(
             Channel<RequestLog> requestLogChannel,
@@ -21,8 +23,10 @@ namespace Infrastructure.Logging.Http.Internal
         {
             _requestLogChannel = requestLogChannel;
             _kafkaProducer = kafkaProducer;
-            _options = options;
             _logger = logger;
+
+            _topicName = options.Value.GetTopicName();
+            _mode = options.Value.Mode;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,10 +41,10 @@ namespace Infrastructure.Logging.Http.Internal
                         Value = item
                     };
 
-                    if (_options.Value.Mode == RequestLogMode.Batch)
-                        _kafkaProducer.Produce(_options.Value.ApplicationName, message);
+                    if (_mode == RequestLogMode.Batch)
+                        _kafkaProducer.Produce(_topicName, message);
                     else
-                        await _kafkaProducer.ProduceAsync(_options.Value.ApplicationName, message, stoppingToken);
+                        await _kafkaProducer.ProduceAsync(_topicName, message, stoppingToken);
                 }
                 catch (Exception ex)
                 {

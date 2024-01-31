@@ -41,7 +41,7 @@ sh run-test.sh
 ```sql
 -- Para cria o stream
 CREATE STREAM account_logs (queryString VARCHAR, headers VARCHAR, path VARCHAR, request VARCHAR, response VARCHAR, statusCode INTEGER, timestamp VARCHAR)
-  WITH (kafka_topic='request-logging.account', value_format='JSON');
+  WITH (kafka_topic='request-logging_account-web', value_format='JSON');
 
 SET 'auto.offset.reset' = 'earliest';
 SET 'auto.offset.reset' = 'latest';

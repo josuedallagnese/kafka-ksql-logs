@@ -6,12 +6,10 @@ namespace Infrastructure.Logging.Http
     public class RequestLogOptions
     {
         /// <summary>
-        /// The application name. Should compatible with Kafka Topic Names
+        /// The application name. Should compatible with Kafka Topic Names.
         /// </summary>
         [Required]
         public string ApplicationName { get; set; }
-
-        public IEnumerable<string> ObfuscateTokens { get; set; }
 
         /// <summary>
         /// Status Codes ignored when request logging collect request data.
@@ -50,8 +48,6 @@ namespace Infrastructure.Logging.Http
                 LingerMs = 10000
             };
 
-            ObfuscateTokens = Enumerable.Empty<string>();
-
             IgnoreStatusCodes = new[]
             {
                 400,
@@ -59,5 +55,7 @@ namespace Infrastructure.Logging.Http
                 403
             };
         }
+
+        public string GetTopicName() => $"request-logging_{ApplicationName}";
     }
 }
