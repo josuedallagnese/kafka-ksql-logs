@@ -7,17 +7,17 @@ import string
 def generate_random_name():
     return ''.join(random.choice(string.ascii_letters + ' ') for i in range(100))[:random.randint(1, 100)]
 
-def generate_random_email():
+def generate_random_mail():
     username = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
 
     domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'example.com']
     domain = random.choice(domains)
-    email = f'{username}@{domain}'
-    return email
+    mail = f'{username}@{domain}'
+    return mail
 
 def get_payload():
     name = generate_random_name()
-    mail = generate_random_email()
+    mail = generate_random_mail()
 
     return json.dumps({"name" : name, "mail" : mail })
 

@@ -45,7 +45,7 @@ app.MapPost("/api/account", [RequestLog] (CreateUserCommand command, [FromHeader
     {
         Id = Guid.NewGuid(),
         Name = command.Name,
-        Mail = command.Email
+        Mail = command.Mail
     };
 
     var error = DateTime.Now.Second > 30;

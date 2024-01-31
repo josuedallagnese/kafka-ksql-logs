@@ -7,7 +7,7 @@ Essa library coleta os dados usando um Attributo de RequestLogAttribute que real
 
 ```json
 {
-	"timestamp": "2024-01-29 14:45:42",
+	"timestamp": "2024-01-31 11:40:30",
 	"path": "POST: /api/account",
 	"statusCode": 201,
 	"queryString": "",
@@ -24,9 +24,9 @@ Essa library coleta os dados usando um Attributo de RequestLogAttribute que real
 		"mail": "HX5haVPa@gmail.com"
 	},
 	"response": {
-		"id": "8041b992-556e-430b-8b09-d4c63f54a663",
+		"id": "612c0a70-70ee-4f2a-9217-9325c44eb554",
 		"name": "pMqqxjyYnHxsUJP VzFoWhSJYOjWBPN uorTWtfusXCqZB culGPiNcYAuzRRweDRcbSJnkjNtrQOuSjqj tVNc",
-		"mail": null
+		"mail": "HX5haVPa@gmail.com"
 	}
 }
 ```
